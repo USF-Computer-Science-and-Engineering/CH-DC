@@ -1,2 +1,3 @@
-# CyberHerd-ccdc
-CyberHerd
+# cyberherd-scripts
+
+Includes hardening/setup scripts for various competitions.
