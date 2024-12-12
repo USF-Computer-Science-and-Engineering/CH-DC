@@ -18,9 +18,8 @@ while IFS=: read -r username _ _ _ _ home shell; do
   if containsElement "$shell" "${valid_shells[@]}" && ! containsElement "$username" "${excludeFromRBash[@]}"; then
     echo "Changing shell for $username to rbash..."
     chsh -s /bin/rbash "$username" >/dev/null
-    
-    find "$home" -type f \( -name ".*shrc" -o -name ".*profile" -o -name ".*history" \) -exec rm -f {} +
 
+    find "$home" -type f \( -name ".*shrc" -o -name ".*profile" -o -name ".*history" \) -exec rm -f {} +
 
     echo 'HISTFILE=/dev/null
 unset HISTFILE
@@ -34,16 +33,32 @@ export PATH' > "$home/.bashrc"
 
     chmod -R go-w "$home"
     find "$home" -type d -exec chmod go+x {} +
-    chattr +i "$home/.bashrc" "$home/.bash_profile" "$home/.profile"
-
   fi
+
 done < /etc/passwd
+
+# Check all home directories for missing .bashrc and related files
+for dir in /home/*; do
+  username=$(basename "$dir")
+  if [ -d "$dir" ] && ! containsElement "$username" "${excludeFromRBash[@]}"; then
+    if [ ! -f "$dir/.bashrc" ]; then
+      echo 'HISTFILE=/dev/null
+unset HISTFILE
+PATH=/usr/local/rbin
+export PATH' > "$dir/.bashrc"
+      cp "$dir/.bashrc" "$dir/.bash_profile"
+      cp "$dir/.bashrc" "$dir/.profile"
+      chown "$username":"$username" "$dir/.bashrc" "$dir/.bash_profile" "$dir/.profile"
+      chmod 644 "$dir/.bashrc" "$dir/.bash_profile" "$dir/.profile"
+    fi
+  fi
+done
 
 mkdir -p /usr/local/rbin
 chown root:root /usr/local/rbin
 chmod 755 /usr/local/rbin
-ln -s /usr/bin/whoami /usr/local/rbin/whoami
-ln -s /usr/bin/id /usr/local/rbin/id
+ln -sf /usr/bin/whoami /usr/local/rbin/whoami
+ln -sf /usr/bin/id /usr/local/rbin/id
 
 chown root:root /usr/local/rbin/whoami
 chown root:root /usr/local/rbin/id
