@@ -13,6 +13,7 @@ socat OPENSSL:127.0.0.1:45778,verify=0 -
 
 ### Connect to bind shell - Windows
 
-```cmd
+``` powershell 
 
 ```
+
