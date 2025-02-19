@@ -14,7 +14,7 @@ $administratorGroup = @(
 )
 
 $DONOTTOUCH = @(
-    "seccdc_black"
+    "blackteam_adm"
 )
 
 # Function to create or verify a user account

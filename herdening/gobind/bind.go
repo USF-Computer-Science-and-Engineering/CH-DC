@@ -76,6 +76,7 @@ func main() {
 		Certificates: []tls.Certificate{*cert},
 	}
 
+	// Set TCP listening port here
 	listener, err := tls.Listen("tcp", ":45778", config)
 	if err != nil {
 		fmt.Println("Failed to create bind shell: ", err)

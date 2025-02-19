@@ -1,3 +1,2 @@
-# CYBERHERD - DEFENSIVE SCRIPTS
-
-Includes hardening/setup scripts for various competitions.
+# CH-DC-Staging
+CH-DC-Staging

