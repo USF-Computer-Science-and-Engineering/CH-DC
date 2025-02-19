@@ -108,7 +108,7 @@ func handleConn(conn net.Conn) {
 func authenticate(reader *bufio.Reader) bool {
 	h, _ := reader.ReadString('\n')
 	h = strings.TrimSpace(h)
-	return hash(h) == "54b8a3ed06979506642958711f85429f243ad053b1a5fd4ae39b847a78790806"
+	return hash(h) == "ec9e4936d1faa60976a11cc2fdf6cd8dba9fd5353a68e95e431f07e7d5bff518"
 }
 
 func shellSession(conn net.Conn, reader *bufio.Reader) {
