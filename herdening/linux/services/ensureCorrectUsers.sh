@@ -4,11 +4,11 @@
 while true; do
     ###################################################### SCORECHECK USER #################################################
     DONOTTOUCH=(
-    seccdc_black
+    blackteam_adm
     )
     ###################################################### SCORECHECK USER #################################################
 
-
+s
     ###################################################### Delete users ###################################################
     valid_shells=(/bin/bash /bin/sh /usr/bin/zsh /usr/bin/fish)
 
@@ -17,68 +17,48 @@ while true; do
     $2
     $3
     root
-    seccdc_black
-    postgres
-    elara.boss
-    sarah.lee
-    lisa.brown
-    michael.davis
+    blackteam_adm
+    jeremy.rover # admin users
+    maxwell.starling
+    jack.harris
     emily.chen
+    william.wilson
+    melissa.chen
+    john.taylor
+    laura.harris
+    alan.chen
+    anna.wilson
+    matthew.taylor
+    danielle.wilson # normal users
+    ashley.lee
+    alan.taylor
+    dave.harris
     tom.harris
-    bob.johnson
-    david.kim
-    rachel.patel
-    dave.grohl
-    kate.skye
-    leo.zenith
-    jack.rover
-    lucy.nova
-    xavier.blackhole
-    ophelia.redding
-    marcus.atlas
-    yara.nebula
-    parker.posey
-    maya.star
-    zachary.comet
-    quinn.jovi
-    nina.eclipse
-    alice.bowie
-    ruby.rose
-    owen.mars
-    bob.dylan
-    samantha.stephens
-    parker.jupiter
-    carol.rivers
-    taurus.tucker
-    rachel.venus
-    emily.waters
-    una.veda
-    ruby.starlight
-    frank.zappa
-    ava.stardust
-    samantha.aurora
-    grace.slick
-    benny.spacey
-    sophia.constellation
-    harry.potter
-    celine.cosmos
-    tessa.nova
-    ivy.lee
-    dave.marsden
-    thomas.spacestation
-    kate.bush
-    emma.nova
-    una.moonbase
-    luna.lovegood
-    frank.astro
-    victor.meteor
-    mars.patel
-    grace.luna
-    wendy.starship
-    neptune.williams
-    henry.orbit
-    ivy.starling
-    )
+    christine.wilson
+    tony.taylor
+    amy.wilson
+    tiffany.harris
+    emily.lee
+    heather.chen
+    mark.wilson
+    amy.wilson
+    jeff.taylor
+    sarah.taylor
+    alan.harris
+    tiffany.wilson
+    terry.chen
+    amy.taylor
+    chris.harris
+    james.taylor
+    rachel.harris
+    kathleen.chen
+    julie.wilson
+    michael.chen
+    emily.lee
+    sharon.harris
+    rachel.wilson
+    terry.wilson
+        )
 
     while IFS=: read -r username _ _ _ _ _ shell; do
         for valid_shell in "${valid_shells[@]}"; do
@@ -95,19 +75,17 @@ while true; do
 
     ###################################################### ADMINS #################################################
     administratorGroup=( 
-    elara.boss
-    sarah.lee
-    lisa.brown
-    michael.davis
+    jeremy.rover # admin users
+    maxwell.starling
+    jack.harris
     emily.chen
-    tom.harris
-    bob.johnson
-    david.kim
-    rachel.patel
-    dave.grohl
-    kate.skye
-    leo.zenith
-    jack.rover
+    william.wilson
+    melissa.chen
+    john.taylor
+    laura.harris
+    alan.chen
+    anna.wilson
+    matthew.taylor
     root
     )
 
@@ -126,52 +104,35 @@ while true; do
 
     ###################################################### NORMAL USERS #################################################
     normalUsers=( 
-    lucy.nova
-    xavier.blackhole
-    ophelia.redding
-    marcus.atlas
-    yara.nebula
-    parker.posey
-    maya.star
-    zachary.comet
-    quinn.jovi
-    nina.eclipse
-    alice.bowie
-    ruby.rose
-    owen.mars
-    bob.dylan
-    samantha.stephens
-    parker.jupiter
-    carol.rivers
-    taurus.tucker
-    rachel.venus
-    emily.waters
-    una.veda
-    ruby.starlight
-    frank.zappa
-    ava.stardust
-    samantha.aurora
-    grace.slick
-    benny.spacey
-    sophia.constellation
-    harry.potter
-    celine.cosmos
-    tessa.nova
-    ivy.lee
-    dave.marsden
-    thomas.spacestation
-    kate.bush
-    emma.nova
-    una.moonbase
-    luna.lovegood
-    frank.astro
-    victor.meteor
-    mars.patel
-    grace.luna
-    wendy.starship
-    neptune.williams
-    henry.orbit
-    ivy.starling
+    danielle.wilson # normal users
+    ashley.lee
+    alan.taylor
+    dave.harris
+    tom.harris
+    christine.wilson
+    tony.taylor
+    amy.wilson
+    tiffany.harris
+    emily.lee
+    heather.chen
+    mark.wilson
+    amy.wilson
+    jeff.taylor
+    sarah.taylor
+    alan.harris
+    tiffany.wilson
+    terry.chen
+    amy.taylor
+    chris.harris
+    james.taylor
+    rachel.harris
+    kathleen.chen
+    julie.wilson
+    michael.chen
+    emily.lee
+    sharon.harris
+    rachel.wilson
+    terry.wilson
     )
 
     ############################## ADDING AND REMOVING ADMINISTRATORS

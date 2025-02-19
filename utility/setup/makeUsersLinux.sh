@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# sudo passwd seccdc_black and then set up a password for black to test it.
+# sudo passwd blackteam_adm and then set up a password for black to test it.
 ############################ NOTE: THIS SCRIPT MAKES USERS THAT SHOULD NOT BE HERE. DO NOT USE THESE LISTS FOR CCDC REFERENCE, USE THE LISTS IN CONTEXT.SH FOR REFERENCE.
 if [ $(whoami) != "root" ]; then
     echo "Script must be run as root"
@@ -11,7 +11,7 @@ fi
 
 ###################################################### SCORECHECK USER #################################################
 DONOTTOUCH=(
-seccdc_black
+blackteam_adm
 )
 ###################################################### SCORECHECK USER #################################################
 
@@ -185,12 +185,12 @@ create_user() {
     fi
 }
 
-# Create a specific user account "seccdc_black"
-if ! id "seccdc_black" &>/dev/null; then
-    echo "Creating user seccdc_black..."
-    useradd -m "seccdc_black"
+# Create a specific user account "blackteam_adm"
+if ! id "blackteam_adm" &>/dev/null; then
+    echo "Creating user blackteam_adm..."
+    useradd -m "blackteam_adm"
 else
-    echo "User seccdc_black already exists."
+    echo "User blackteam_adm already exists."
 fi
 
 # Process administratorGroup

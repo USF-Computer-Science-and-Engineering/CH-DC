@@ -1,0 +1,102 @@
+###
+<#
+    Script: Generate_PII_Report.ps1
+    Description: Processes pdscan output, separates high and low confidence matches, and generates a clean, formatted report.
+
+    Process Overview:
+    1. Define the paths for the input (pdscan output) and output (report file).
+    2. Check if the pdscan output file exists; exit if not found.
+    3. Parse the pdscan output:
+        - Extract file path, data type, and confidence level (high/low).
+        - Store high confidence matches in one array and low confidence matches in another.
+    4. Generate a report:
+        - Create a "High Confidence Matches" section.
+        - Create a "Low Confidence Matches" section, adding extra spacing between sections for clarity.
+    5. Save the final report to the specified output path.
+    6. Output a success message with the report location.
+
+    Notes:
+    - Confidence level is not displayed in the report as matches are already separated by sections.
+    - Ensure input file formatting matches expected pdscan output for proper parsing.
+#>
+###
+
+function Generate_PII_Report {
+    # Define paths
+    $pdscanOutputPath = "C:\Users\pdscan_output4.txt" # CHANGE into Path to pdscan output
+    $reportOutputPath = "C:\Users\test\final_report5.txt"  # CHANGE into Path for the report
+
+    # Ensure the pdscan output file exists
+    if (-Not (Test-Path $pdscanOutputPath)) {
+        Write-Host "Error: pdscan output file not found at $pdscanOutputPath"
+        exit 1
+    }
+
+    # Read pdscan output
+    $pdscanOutput = Get-Content $pdscanOutputPath
+    $highConfidence = @()  # Array for high confidence matches
+    $lowConfidence = @()   # Array for low confidence matches
+
+    # Parse the pdscan output
+    for ($i = 0; $i -lt $pdscanOutput.Count; $i++) {
+        $line = $pdscanOutput[$i]
+        
+        # Match lines with the main pdscan detection details
+        if ($line -match "^(.+): found (.+) \((\d+) lines?, (\w+ confidence)?\)$") {
+            $filePath = $matches[1]
+            $type = $matches[2]
+            $confidence = if ($matches[4] -ne $null) { $matches[4] } else { "low confidence" }
+
+            # Look for the next line containing data
+            $dataLine = $pdscanOutput[$i + 1] -replace "^\s+", ""  # Remove leading spaces
+            $matchObject = [PSCustomObject]@{
+                FilePath = $filePath
+                Type = $type
+                Data = $dataLine
+            }
+
+            # Add match to the appropriate array based on confidence
+            if ($confidence -eq "high confidence") {
+                $highConfidence += $matchObject
+            } else {
+                $lowConfidence += $matchObject
+            }
+        }
+    }
+
+    # Check if there is data to report
+    if ($highConfidence.Count -eq 0 -and $lowConfidence.Count -eq 0) {
+        Write-Host "No data found in pdscan output to generate a report."
+        exit 1
+    }
+
+    # Generate the report
+    $report = "PDScan Detailed Report`n" + ("=" * 60) + "`n"
+
+    # Add high confidence section
+    if ($highConfidence.Count -gt 0) {
+        $report += "High Confidence Matches`n" + ("-" * 60) + "`n"
+        foreach ($result in $highConfidence) {
+            $report += "File Path: $($result.FilePath)`n"
+            $report += "Type: $($result.Type)`n"
+            $report += "Data: $($result.Data)`n`n"
+        }
+    }
+
+    # Add low confidence section
+    if ($lowConfidence.Count -gt 0) {
+        $report += "Low Confidence Matches`n" + ("-" * 60) + "`n"
+        foreach ($result in $lowConfidence) {
+            $report += "File Path: $($result.FilePath)`n"
+            $report += "Type: $($result.Type)`n"
+            $report += "Data: $($result.Data)`n`n"
+        }
+    }
+
+    # Save the report
+    Set-Content -Path $reportOutputPath -Value $report
+    Write-Host "Detailed report generated successfully: $reportOutputPath"
+}
+
+# Call the function
+Generate_PII_Report

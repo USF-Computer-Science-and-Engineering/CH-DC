@@ -22,7 +22,7 @@ $administratorGroup = @(
 )
 
 $DONOTTOUCH = @(
-"seccdc_black"
+"blackteam_adm"
 )
 
 # Create or clear the file at the beginning
