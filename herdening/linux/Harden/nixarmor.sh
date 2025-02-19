@@ -40,7 +40,7 @@ disable_compilers() {
 
 
 fix_file_permissions() {
-    cat ./fileperms.txt | bash 2>/dev/null
+    cat /root/CH-DC/herdening/linux/Harden/fileperms.txt | bash 2>/dev/null
 }
 
 
