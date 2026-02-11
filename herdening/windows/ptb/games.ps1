@@ -178,6 +178,15 @@ function Install-Tools {
         Write-Host "SystemInformer installer not found."
     }
 
+    $netLimiterInstaller = Join-Path -Path $toolsDir -ChildPath "netlimiter-5.3.26.0.exe"
+    if (Test-Path $netLimiterInstaller) {
+        Write-Host "Executing NetLimiter installer..."
+        Start-Process -FilePath $netLimiterInstaller -Wait
+        Write-Host "NetLimiter installation completed."
+    } else {
+        Write-Host "NetLimiter installer not found."
+    }    
+
     $pwsh7 = Join-Path -Path $toolsDir -ChildPath "PowerShell-7.5.0-win-x64.msi"
     if (Test-Path $pwsh7) {
         Write-Host "installing pswh7"
