@@ -49,6 +49,7 @@ function Install-Tools {
             "https://github.com/PowerShell/PowerShell/releases/download/v7.5.0/PowerShell-7.5.0-win-x64.msi",
             "https://github.com/ankane/pdscan/releases/download/v0.1.8/pdscan-0.1.8-x86_64-windows.zip",
             "https://ninite.com/7zip-firefox-notepadplusplus-python3-vscode/ninite.exe"
+            "https://download.netlimiter.com/nl/netlimiter-5.3.26.0.exe"
         ),
         [array]$targetEXEs = @(
             "ADExplorer.exe",
@@ -59,6 +60,7 @@ function Install-Tools {
             "Procmon.exe",
             "tcpview.exe"
             "Sysmon.exe"
+            "netlimiter-5.3.26.0.exe"
         )
     )
 
