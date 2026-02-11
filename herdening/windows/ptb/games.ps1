@@ -60,7 +60,6 @@ function Install-Tools {
             "Procmon.exe",
             "tcpview.exe"
             "Sysmon.exe"
-            "netlimiter-5.3.26.0.exe"
         )
     )
 
