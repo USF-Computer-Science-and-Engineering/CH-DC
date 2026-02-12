@@ -1,3 +1,7 @@
+param(
+    [string[]]$e
+)
+
 Import-Module ActiveDirectory -ErrorAction Stop
 
 $logPath = Join-Path -Path $PSScriptRoot -ChildPath ("password-reset-{0}.log" -f (Get-Date -Format "yyyyMMdd-HHmmss"))
@@ -13,23 +17,42 @@ function Write-Log {
     Add-Content -Path $logPath -Value $line
 }
 
+# Build exclusion set from -e (comma-separated supported)
+$excludeSet = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+if ($e) {
+    foreach ($token in $e) {
+        foreach ($name in ($token -split ',')) {
+            $name = $name.Trim()
+            if ($name) { [void]$excludeSet.Add($name) }
+        }
+    }
+}
+
 Write-Log "Starting domain password reset."
 Write-Log ("Log file: {0}" -f $logPath)
 
-$userPassword = Read-Host "Enter the password to set for all domain users" -AsSecureString
+if ($excludeSet.Count -gt 0) {
+    Write-Log ("Excluding {0} username(s): {1}" -f $excludeSet.Count, (($excludeSet | Sort-Object) -join ', ')) "WARN"
+}
+
+$userPassword  = Read-Host "Enter the password to set for all domain users" -AsSecureString
 $adminPassword = Read-Host "Enter the password to set for all Domain Admins" -AsSecureString
 
-Write-Log "Fetching domain users (excluding computer accounts, Domain Admins, and KRBTGT)."
+Write-Log "Fetching domain users (excluding computer accounts, Domain Admins, KRBTGT, and -e exclusions)."
+
 $domainAdminDns = Get-ADGroupMember -Identity "Domain Admins" -Recursive |
     Where-Object { $_.objectClass -eq "user" } |
     Select-Object -ExpandProperty DistinguishedName
+
 $domainAdminDnSet = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
-foreach ($dn in $domainAdminDns) {
-    [void]$domainAdminDnSet.Add($dn)
-}
+foreach ($dn in $domainAdminDns) { [void]$domainAdminDnSet.Add($dn) }
 
 $domainUsers = Get-ADUser -LDAPFilter "(&(objectCategory=person)(objectClass=user))" -Properties SamAccountName, DistinguishedName |
-    Where-Object { -not $domainAdminDnSet.Contains($_.DistinguishedName) -and $_.SamAccountName -ne "krbtgt" }
+    Where-Object {
+        -not $domainAdminDnSet.Contains($_.DistinguishedName) -and
+        $_.SamAccountName -ne "krbtgt" -and
+        -not $excludeSet.Contains($_.SamAccountName)
+    }
 
 foreach ($user in $domainUsers) {
     try {
@@ -40,9 +63,14 @@ foreach ($user in $domainUsers) {
     }
 }
 
-Write-Log "Fetching Domain Admins (users only, excluding KRBTGT)."
+Write-Log "Fetching Domain Admins (users only, excluding KRBTGT and -e exclusions)."
+
 $domainAdmins = Get-ADGroupMember -Identity "Domain Admins" -Recursive |
-    Where-Object { $_.objectClass -eq "user" -and $_.SamAccountName -ne "krbtgt" }
+    Where-Object {
+        $_.objectClass -eq "user" -and
+        $_.SamAccountName -ne "krbtgt" -and
+        -not $excludeSet.Contains($_.SamAccountName)
+    }
 
 foreach ($admin in $domainAdmins) {
     try {
