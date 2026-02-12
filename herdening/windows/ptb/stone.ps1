@@ -1,3 +1,15 @@
+function Ask-UserYesNo {
+    param (
+        [string]$Message
+    )
+
+    do {
+        $response = Read-Host "$Message (Y/N)"
+    } until ($response -match '^[YyNn]$')
+
+    return ($response -match '^[Yy]$')
+}
+
 function CredHardening {
     param (
         [switch]$YesToAll
@@ -64,14 +76,14 @@ function CredHardening {
     }
     Search-AutoLogonSettings
 
-
-    $group1Commands = @(
-        'reg add HKLM\SYSTEM\CurrentControlSet\Control\Lsa /v restrictanonymous /t REG_DWORD /d 1 /f',
-        'reg add HKLM\SYSTEM\CurrentControlSet\Control\Lsa /v restrictanonymoussam /t REG_DWORD /d 1 /f',
-        'reg add HKLM\SYSTEM\CurrentControlSet\Control\Lsa /v disabledomaincreds /t REG_DWORD /d 1 /f'
-    )
-    Apply-GroupedRegistryChanges "Disable Anonymous Access" $group1Commands
-
+    if (Ask-UserYesNo "Do you want to disable anonymous access and null sessions? (May mess with WinRM) (Y/N)") {
+        $group1Commands = @(
+            'reg add HKLM\SYSTEM\CurrentControlSet\Control\Lsa /v restrictanonymous /t REG_DWORD /d 1 /f',
+            'reg add HKLM\SYSTEM\CurrentControlSet\Control\Lsa /v restrictanonymoussam /t REG_DWORD /d 1 /f',
+            'reg add HKLM\SYSTEM\CurrentControlSet\Control\Lsa /v disabledomaincreds /t REG_DWORD /d 1 /f'
+        )
+        Apply-GroupedRegistryChanges "Disable Anonymous Access" $group1Commands
+    }
 
     $group2Commands = @(
         'reg add HKLM\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters /v EnablePlainTextPassword /t REG_DWORD /d 0 /f',
@@ -86,7 +98,12 @@ function CredHardening {
     )
     Apply-GroupedRegistryChanges "UAC and Installer Policies" $group3Commands
 
-
+    if (Ask-UserYesNo "Do you want to enable Protected Process Light (PPL) for LSASS? (May mess with) (Y/N)") {
+         $group4Commands = @(
+            'reg add HKLM\SYSTEM\CurrentControlSet\Control\Lsa /v RunAsPPL /t REG_DWORD /d 1 /f'
+        )
+        Apply-GroupedRegistryChanges "Protected Process Light" $group4Commands
+    }
     $group4Commands = @(
         'reg add HKLM\SYSTEM\CurrentControlSet\Control\Lsa /v RunAsPPL /t REG_DWORD /d 1 /f'
     )
@@ -99,12 +116,13 @@ function CredHardening {
     )
     Apply-GroupedRegistryChanges "Disable SMBv1 and Enable SMBv2" $group5Commands
 
-  
-    $group6Commands = @(
-        'reg add "HKLM\SYSTEM\CurrentControlSet\Control\Lsa" /v NoLMHash /t REG_DWORD /d 1 /f',
-        'reg add "HKLM\SYSTEM\CurrentControlSet\Control\Lsa" /v LMCompatibilityLevel /t REG_DWORD /d 5 /f'
-    )
-    Apply-GroupedRegistryChanges "Disable NTLMv1 and Enable Advanced Security Settings" $group6Commands
+    if (Ask-UserYesNo "Do you want to disable NTLMv1 and enforce advanced security settings? (May mess with WinRM) (Y/N)") {
+         $group6Commands = @(
+            'reg add "HKLM\SYSTEM\CurrentControlSet\Control\Lsa" /v NoLMHash /t REG_DWORD /d 1 /f',
+            'reg add "HKLM\SYSTEM\CurrentControlSet\Control\Lsa" /v LMCompatibilityLevel /t REG_DWORD /d 5 /f'
+        )
+        Apply-GroupedRegistryChanges "Disable NTLMv1 and Enable Advanced Security Settings" $group6Commands
+    }
 
 
     $group7Commands = @(
@@ -200,10 +218,13 @@ function CredHardening {
   
     #Remove-WriteAccessOnAllShares UNCOMMENT TO REMOVE THE ACCESSS!!!!!!!!!!!!!
 
-    $group11Commands = @(
-        'reg add "HKLM\SYSTEM\CurrentControlSet\Control\Lsa" /v LsaCfgFlags /t REG_DWORD /d 1 /f'
-    )
-    Apply-GroupedRegistryChanges "Enable Credential Guard" $group11Commands
+    if (Ask-UserYesNo "Do you want to enable Credential Guard? (May mess with WinRM) (Y/N)") {
+         $group10Commands = @(
+            'reg add "HKLM\SYSTEM\CurrentControlSet\Control\DeviceGuard" /v EnableVirtualizationBasedSecurity /t REG_DWORD /d 1 /f',
+            'reg add "HKLM\SYSTEM\CurrentControlSet\Control\DeviceGuard" /v HypervisorEnforcedCodeIntegrity /t REG_DWORD /d 1 /f'
+        )
+        Apply-GroupedRegistryChanges "Enable Credential Guard" $group10Commands
+    }
 
 
     $group12Commands = @(
