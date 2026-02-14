@@ -43,7 +43,7 @@ $domainRoleMap = @{
     5 = 'Primary Domain Controller'
 }
 
-$domainRole = $computerSystem.DomainRole
+$domainRole = [int]$computerSystem.DomainRole
 $domainRoleText = if ($domainRoleMap.ContainsKey($domainRole)) { $domainRoleMap[$domainRole] } else { 'Unknown' }
 $isDomainController = $domainRole -in 4, 5
 
