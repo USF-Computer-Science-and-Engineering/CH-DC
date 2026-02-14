@@ -1,0 +1,43 @@
+name: build and test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+    - name: checkout repo
+      uses: actions/checkout@v4
+
+    - name: setup go toolchain
+      uses: actions/setup-go@v5
+      with:
+        go-version: 1.24
+
+    - name: run linters
+      run: make lint
+
+    - name: build binaries
+      run: |
+        make build
+        ls -lh ./dist
+
+    - name: run unit tests with race detection
+      timeout-minutes: 5
+      run: make test-unit-with-race
+    
+    - name: run integration tests with race detection
+      timeout-minutes: 5
+      run: make test-integration-with-race
+
+    - name: run e2e tests
+      timeout-minutes: 20
+      run: make test-e2e
